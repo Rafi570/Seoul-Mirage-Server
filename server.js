@@ -1,4 +1,6 @@
 require("dotenv").config();
+const productRoutes = require("./routes/productRoutes");
+const authRoutes = require('./routes/authRoutes');
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
@@ -22,19 +24,20 @@ app.use(
   }),
 );
 
-
 app.use(express.json());
 
+app.use("/api/products", productRoutes);
+app.use('/api/auth', authRoutes);
 app.get("/", (req, res) => {
   res.send("seoulmirage's API is up and running! 🚀");
 });
 
-
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send({ message: "Something went wrong!", error: err.message });
+  res
+    .status(500)
+    .send({ message: "Something went wrong!", error: err.message });
 });
-
 
 app.listen(port, () => {
   console.log(`✨ Server is humming along on port ${port}`);
