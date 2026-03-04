@@ -1,6 +1,7 @@
 require("dotenv").config();
 const productRoutes = require("./routes/productRoutes");
 const authRoutes = require('./routes/authRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
@@ -8,7 +9,7 @@ const connectDB = require("./config/db");
 const app = express();
 const port = process.env.PORT || 5001;
 
-const allowedOrigins = ["http://localhost:3000"];
+const allowedOrigins = ["http://localhost:3000","http://127.0.0.1:5500"];
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -28,6 +29,7 @@ app.use(express.json());
 
 app.use("/api/products", productRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/orders', orderRoutes);
 app.get("/", (req, res) => {
   res.send("seoulmirage's API is up and running! 🚀");
 });
