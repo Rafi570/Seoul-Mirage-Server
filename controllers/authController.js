@@ -67,31 +67,31 @@ exports.getAllUsers = async (req, res) => {
 };
 // 4. UPDATE USER ROLE (PATCH)
 exports.updateUserRole = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { role } = req.body;
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
 
-        // শুধু admin বা user রোল ই এলাউ করা হবে
-        if (!['admin', 'user'].includes(role)) {
-            return res.status(400).json({ message: "Invalid role type" });
-        }
-
-        const updatedUser = await User.findByIdAndUpdate(
-            id,
-            { role },
-            { new: true }
-        ).select("-password");
-
-        if (!updatedUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: `User role updated to ${role} ✅`,
-            user: updatedUser
-        });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    // শুধু admin বা user রোল ই এলাউ করা হবে
+    if (!["admin", "user"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role type" });
     }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true },
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `User role updated to ${role} ✅`,
+      user: updatedUser,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };

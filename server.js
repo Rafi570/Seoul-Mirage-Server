@@ -9,7 +9,7 @@ const connectDB = require("./config/db");
 const app = express();
 const port = process.env.PORT || 5001;
 
-const allowedOrigins = ["http://localhost:3000","http://127.0.0.1:5500","https://seoulc.vercel.app"];
+const allowedOrigins = ["http://localhost:3000","http://127.0.0.1:5500","https://seoulc.vercel.app","http://localhost:5173"];
 app.use(
   cors({
     origin: function (origin, callback) {
