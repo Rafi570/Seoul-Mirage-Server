@@ -1,10 +1,33 @@
 const Product = require("../models/Product");
 
 // 1. GET ALL PRODUCTS
+// 1. GET ALL PRODUCTS with optional pagination
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
-    res.status(200).json(products);
+    const page = parseInt(req.query.page) || 0; // default: 0 => return all
+    const limit = parseInt(req.query.limit) || 0; // default: 0 => return all
+
+    if (page > 0 && limit > 0) {
+      // Paginated response
+      const skip = (page - 1) * limit;
+      const totalProducts = await Product.countDocuments();
+      const products = await Product.find().skip(skip).limit(limit);
+
+      const totalPages = Math.ceil(totalProducts / limit);
+
+      res.status(200).json({
+        success: true,
+        page,
+        totalPages,
+        totalProducts,
+        count: products.length,
+        data: products,
+      });
+    } else {
+      // Return all products if no page/limit provided
+      const products = await Product.find();
+      res.status(200).json(products);
+    }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
