@@ -13,6 +13,7 @@ const orderSchema = new mongoose.Schema({
         postCode: String
     },
     totalAmount: Number,
+    transactionId: { type: String },
     status: { 
         type: String, 
         enum: ['Unpaid', 'Paid', 'Shipped', 'Delivered', 'Cancelled'],
