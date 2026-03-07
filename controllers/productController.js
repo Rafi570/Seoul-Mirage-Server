@@ -2,30 +2,45 @@ const Product = require("../models/Product");
 
 // 1. GET ALL PRODUCTS
 // 1. GET ALL PRODUCTS with optional pagination
+// 1. GET ALL PRODUCTS (With Search & Pagination)
 exports.getAllProducts = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 0; // default: 0 => return all
-    const limit = parseInt(req.query.limit) || 0; // default: 0 => return all
+    const { page, limit, q } = req.query;
+    
+    // সার্চ ফিল্টার তৈরি
+    let query = {};
+    if (q) {
+      query = {
+        $or: [
+          { name: { $regex: q, $options: "i" } },        // নামের মধ্যে সার্চ করবে
+          { category: { $regex: q, $options: "i" } },    // ক্যাটাগরির মধ্যে সার্চ করবে
+          { description: { $regex: q, $options: "i" } } // ডেসক্রিপশনের মধ্যে সার্চ করবে
+        ]
+      };
+    }
 
-    if (page > 0 && limit > 0) {
+    const pageNum = parseInt(page) || 0;
+    const limitNum = parseInt(limit) || 0;
+
+    if (pageNum > 0 && limitNum > 0) {
       // Paginated response
-      const skip = (page - 1) * limit;
-      const totalProducts = await Product.countDocuments();
-      const products = await Product.find().skip(skip).limit(limit);
+      const skip = (pageNum - 1) * limitNum;
+      const totalProducts = await Product.countDocuments(query);
+      const products = await Product.find(query).skip(skip).limit(limitNum);
 
-      const totalPages = Math.ceil(totalProducts / limit);
+      const totalPages = Math.ceil(totalProducts / limitNum);
 
       res.status(200).json({
         success: true,
-        page,
+        page: pageNum,
         totalPages,
         totalProducts,
         count: products.length,
         data: products,
       });
     } else {
-      // Return all products if no page/limit provided
-      const products = await Product.find();
+      // Return all or filtered products if no page/limit provided
+      const products = await Product.find(query);
       res.status(200).json(products);
     }
   } catch (err) {
