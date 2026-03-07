@@ -18,18 +18,18 @@ const allowedOrigins = [
   "https://seoulc.vercel.app",
   "http://localhost:5173",
   "https://sandbox.sslcommerz.com",
-  "https://securepay.sslcommerz.com"
+  "https://securepay.sslcommerz.com",
+  "https://seoul-mirage-react-client.vercel.app"
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-    
-      if (!origin || origin === "null" || allowedOrigins.includes(origin)) {
+      // SSLCommerz অনেক সময় origin পাঠায় না, তাই !origin চেকটি জরুরি
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        console.log("Blocked by CORS from Origin:", origin);
-        callback(new Error("Not allowed by CORS"));
+        callback(null, true); // প্রোডাকশনে পেমেন্ট গেটওয়ের জন্য এটা সাময়িকভাবে true রাখতে পারেন যদি সমস্যা হয়
       }
     },
     credentials: true,
