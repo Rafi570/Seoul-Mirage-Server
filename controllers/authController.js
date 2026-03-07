@@ -56,10 +56,23 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-// ALL USER GET
+// ALL USER GET with SEARCH
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password");
+    const { search } = req.query;
+    let query = {};
+
+  
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } }
+        ]
+      };
+    }
+
+    const users = await User.find(query).select("-password").sort({ createdAt: -1 });
     res.status(200).json({ success: true, users });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -90,6 +103,30 @@ exports.updateUserRole = async (req, res) => {
       success: true,
       message: `User role updated to ${role} ✅`,
       user: updatedUser,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+// GET USER ROLE BY EMAIL
+exports.getRole = async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email }).select("email role");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      email: user.email,
+      role: user.role,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
