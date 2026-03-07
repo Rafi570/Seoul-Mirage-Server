@@ -132,3 +132,34 @@ exports.getRole = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+// user pass change api
+// CHANGE PASSWORD (PATCH)
+exports.changePassword = async (req, res) => {
+  try {
+    const { email, oldPassword, newPassword } = req.body;
+
+  
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password does not match!" });
+    }
+
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Password updated successfully! 🔐" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
