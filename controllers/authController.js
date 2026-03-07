@@ -163,3 +163,46 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+// এই ফাংশনটি কন্ট্রোলারের নিচে যোগ করুন
+exports.updateProfile = async (req, res) => {
+  try {
+    const { email, name, phone, address } = req.body;
+
+    // ইউজার খুঁজে বের করা
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ডেটা আপডেট করা (যদি রিকোয়েস্টে থাকে)
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+    
+    // শিপিং এড্রেস আপডেট (Object আকারে আসলে)
+    if (address) {
+      user.address = {
+        apartment: address.apartment || user.address.apartment,
+        city: address.city || user.address.city,
+        state: address.state || user.address.state,
+        postalCode: address.postalCode || user.address.postalCode,
+        country: address.country || user.address.country,
+      };
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully! ✨",
+      user: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        role: user.role
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

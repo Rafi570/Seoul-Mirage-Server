@@ -8,5 +8,5 @@ router.get("/users", authController.getAllUsers);
 router.patch("/update-role/:id", authController.updateUserRole);
 router.get("/role", authController.getRole);
 router.patch('/change-password', authController.changePassword);
-
+router.patch('/update-profile', authController.updateProfile);
 module.exports = router;
